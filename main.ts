@@ -3,7 +3,7 @@
 // writes /output/answers.json: a JSON array of the answers, one per case and in the cases' order. Outside a
 // container MAKEFUN_INPUT_DIR and MAKEFUN_OUTPUT_DIR stand in for /input and /output.
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { setFlagsFromString } from 'node:v8';
 
@@ -20,4 +20,6 @@ const cases = JSON.parse(readFileSync(join(INPUT_DIR, 'cases.json'), 'utf8')) as
 // Pre-sized: the harness's whole run is three cases, and growing the array costs a reallocation per case.
 const answers: unknown[] = new Array(cases.length);
 for (let k = 0; k < cases.length; k++) answers[k] = run(cases[k].input);
+// The harness mounts /output, but a local run may not have it yet; creating it costs nothing when it exists.
+mkdirSync(OUTPUT_DIR, { recursive: true });
 writeFileSync(join(OUTPUT_DIR, 'answers.json'), JSON.stringify(answers));
